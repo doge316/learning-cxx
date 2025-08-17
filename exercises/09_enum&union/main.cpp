@@ -17,7 +17,7 @@ enum ColorEnum : unsigned char {
 // 其内部标识符需要带前缀引用，如 `Color::Red`。
 // 作用域枚举型可以避免命名空间污染，并提供类型安全保证。
 enum class Color : int {
-    Red = COLOR_RED,
+    Red = COLOR_RED,// 只能用static_cast转换成int类型，无法隐式转换，避免污染//使用时要加命名空间Color::Red
     Green,
     Yellow,
     Blue,
@@ -30,7 +30,8 @@ ColorEnum convert_by_pun(Color c) {
     // 但这种写法实际上仅在 C 语言良定义，在 C++ 中是未定义行为。
     // 这是比较少见的 C++ 不与 C 保持兼容的特性。
     // READ: 类型双关 <https://tttapa.github.io/Pages/Programming/Cpp/Practices/type-punning.html>
-    union TypePun {
+
+    union TypePun {//union允许共享内存，大小为最大成员的大小，修改一个成员的值会影响其他成员的值
         ColorEnum e;
         Color c;
     };

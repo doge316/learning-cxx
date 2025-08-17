@@ -15,21 +15,40 @@ class DynFibonacci {
 
 public:
     // TODO: 实现动态设置容量的构造器
-    DynFibonacci(int capacity): cache(new ?), cached(?) {}
+    DynFibonacci(int capacity): cache(new size_t[capacity]), cached(0) {
+        cache[0] = 0;
+        cache[1] = 1;
+    }
 
     // TODO: 实现移动构造器
-    DynFibonacci(DynFibonacci &&) noexcept = delete;
+    DynFibonacci(DynFibonacci &&other) noexcept{//如不加引用，会调用复制构造函数增加开销；
+        //const左值引用不会修改指向值，因此可以指向右值，这也是为什么要使用const &作为函数参数的原因之一
+        cache=other.cache;
+        cached=other.cached;
+        other.cache=nullptr;
+        other.cached=0;
+    }
 
     // TODO: 实现移动赋值
     // NOTICE: ⚠ 注意移动到自身问题 ⚠
-    DynFibonacci &operator=(DynFibonacci &&) noexcept = delete;
+    DynFibonacci &operator=(DynFibonacci && other) noexcept {
+        if(this== &other) return *this;
+        delete[] cache;
+        cache=other.cache;
+        cached=other.cached;
+        other.cache=nullptr;
+        other.cached=0;
+        return*this;
+    }
 
     // TODO: 实现析构器，释放缓存空间
-    ~DynFibonacci();
+    ~DynFibonacci(){
+        delete[] cache;
+    }
 
     // TODO: 实现正确的缓存优化斐波那契计算
     size_t operator[](int i) {
-        for (; false; ++cached) {
+        for (cached=2; cached<=i; ++cached) {
             cache[cached] = cache[cached - 1] + cache[cached - 2];
         }
         return cache[i];

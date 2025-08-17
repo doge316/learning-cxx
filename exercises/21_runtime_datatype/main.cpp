@@ -8,6 +8,8 @@ enum class DataType {
 
 /// @brief Tagged union 即标签化联合体，是联合体的一种常见应用。
 ///        Rust enum 在实现上就是标签化联合体。
+
+///@brief 结构体的大小需要内存对齐，使用连续内存模型
 struct TaggedUnion {
     DataType type;
     // NOTICE: struct/union 可以相互任意嵌套。
@@ -18,13 +20,25 @@ struct TaggedUnion {
 };
 
 // TODO: 将这个函数模板化用于 sigmoid_dyn
-float sigmoid(float x) {
+template<typename T>
+T sigmoid(T x) {
     return 1 / (1 + std::exp(-x));
 }
 
 TaggedUnion sigmoid_dyn(TaggedUnion x) {
-    TaggedUnion ans{x.type};
-    // TODO: 根据 type 调用 sigmoid
+    TaggedUnion ans{x.type}; // 初始化为返回值的 type,聚合初始化，按顺序初始化成员
+    // TODO: 根据 type 调用 sigmoid来初始化union成员
+    switch (x.type) {
+        case DataType::Float:
+            ans.f = sigmoid(x.f);
+            break;
+        case DataType::Double:
+            ans.d = sigmoid(x.d);
+            break;
+        default:
+            // 这里可以抛出异常或处理错误情况
+            throw std::invalid_argument("Unsupported data type");
+    }
     return ans;
 }
 
